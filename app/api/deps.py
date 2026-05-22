@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -11,23 +11,23 @@ from app.database import get_db
 from app.models.user import User, UserRole
 
 
-# https://fastapi.tiangolo.com/tutorial/security/first-steps/#create-main-py
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+bearer_scheme = HTTPBearer()
 
 DbSession = Annotated[Session, Depends(get_db)]
 
 
 def get_current_user(
     db: DbSession,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
 ) -> User:
     """Obtener el usuario autenticado mediante bearer token"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="No se pudo validar credenciales",
-        # https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Headers/WWW-Authenticate
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    token = credentials.credentials
 
     try:
         payload = decode_access_token(token)
