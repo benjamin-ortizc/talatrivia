@@ -10,6 +10,9 @@ dependencies = [
     "psycopg[binary]>=3.2,<3.3",
     "pydantic-settings>=2.6,<3",
     "alembic>=1.18,<1.19",
+    "PyJWT>=2.12,<2.13",
+    "bcrypt>=5.0,<6",
+    "email-validator>=2.2,<3",
 ]
 
 [build-system]

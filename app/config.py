@@ -4,13 +4,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    # App
     debug: bool = False
-    secret_key: str
+
+    # Database
     db_name: str
     db_user: str
     db_password: str
     db_host: str
     db_port: int = 5432
+
+    # JWT
+    jwt_secret: str
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 1440
 
     # Property for get URL connection string
     @property
