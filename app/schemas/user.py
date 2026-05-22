@@ -9,7 +9,6 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
-    role: UserRole = UserRole.PLAYER
 
 
 class UserRead(BaseModel):

@@ -6,7 +6,7 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.user import UserCreate
 
 
@@ -29,7 +29,7 @@ def register_user(db: Session, user_data: UserCreate) -> User:
         name=user_data.name,
         email=user_data.email,
         password_hash=hash_password(user_data.password),
-        role=user_data.role.value,
+        role=UserRole.PLAYER.value,
     )
 
     db.add(user)

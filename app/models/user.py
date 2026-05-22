@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 class UserRole(str, Enum):
-    ADMIN = "admin"
     PLAYER = "player"
+    ADMIN = "admin"
 
 class User(Base):
     __tablename__ = "users"
