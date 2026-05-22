@@ -6,7 +6,7 @@ from app.models.user import User
 from app.schemas.user import UserRead
 
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["Usuarios"])
 
 
 @router.get("/me", response_model=UserRead)
