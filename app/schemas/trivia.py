@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.schemas.question import QuestionRead
 from app.schemas.user import UserRead
@@ -8,7 +8,7 @@ from app.schemas.user import UserRead
 
 class AnswerOptionPlay(BaseModel):
     """
-    Contrato de la respuesta a la pregunta.
+    Modelo de datos de la respuesta a la pregunta.
     Devuelve el texto de la posible respuesta, sin exponer si es correcta.
     """
 
@@ -19,7 +19,7 @@ class AnswerOptionPlay(BaseModel):
 
 
 class QuestionPlay(BaseModel):
-    """Contrato de la pregunta que verá el jugador, incluye AnswerOptionPlay"""
+    """Modelo de datos de la pregunta que verá el jugador, incluye AnswerOptionPlay"""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -83,7 +83,7 @@ class TriviaForUser(BaseModel):
 
 class TriviaPlay(BaseModel):
     """
-    Contrato del endpoint de play. Devuelve las preguntas y opciones de una trivia ocultando
+    Modelo de datos del endpoint de play. Devuelve las preguntas y opciones de una trivia ocultando
     información sensible acerca de las respuestas (dificultad y si es que la respuesta es correcta)
     """
 
@@ -93,3 +93,53 @@ class TriviaPlay(BaseModel):
     name: str
     description: str | None
     questions: list[QuestionPlay]
+
+
+class AnswerSubmit(BaseModel):
+    """Una respuesta enviada por el jugador para una pregunta de la trivia."""
+
+    question_id: int
+    selected_option_id: int
+
+
+class TriviaSubmit(BaseModel):
+    """Modelo de datos del endpoint de submit. Debe incluir solo una respuesta por cada pregunta."""
+
+    answers: list[AnswerSubmit] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def no_duplicate_questions(self) -> "TriviaSubmit":
+        question_ids = [a.question_id for a in self.answers]
+        if len(question_ids) != len(set(question_ids)):
+            raise ValueError(
+                "No se pueden enviar respuestas duplicadas para la misma pregunta"
+            )
+        return self
+
+
+class QuestionResult(BaseModel):
+    """Resultado individual de una pregunta, utilizado como un set en TriviaSubmitResult"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    question_id: int
+    is_correct: bool
+
+
+class TriviaSubmitResult(BaseModel):
+    """Resultado del submit de la trivia"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    score: int
+    completed_at: datetime
+    results: list[QuestionResult] = Field(validation_alias="answers")
+
+
+class RankingItem(BaseModel):
+    """Una entrada del ranking de una trivia"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    user: UserRead
+    score: int
