@@ -42,4 +42,4 @@ known-first-party = ["app"]
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/env.py" = ["F401"]
-"alembic/versions/*.py" = ["F401"]
+"alembic/versions/*.py" = ["I001", "W291", "W292", "E501"]
