@@ -25,7 +25,7 @@ Almacena a los usuarios de la plataforma.
 
 ### Trivia
 
-Almacena las trivias creadas por User con role 'admin'.
+Almacena las trivias del sistema.
 
 | Column        | Type     | Constraints | Description                    |
 |---------------|----------|-------------|--------------------------------|
@@ -33,6 +33,8 @@ Almacena las trivias creadas por User con role 'admin'.
 | `name`        | str      | NOT NULL    | Nombre de la trivia            |
 | `description` | str      |             | Descripción opcional           |
 | `created_at`  | datetime | NOT NULL    | Fecha y hora de la creación    |
+
+> No se persiste un FK al admin que creó la trivia. La restricción del rol se aplica a nivel de endpoint con la dependency `AdminUser`, no a nivel de schema, ya que para el scope actual no se requiere auditoría de autoría.
 
 ---
 
@@ -46,6 +48,8 @@ Almacena preguntas, las cuales pueden ser reutilizadas para diferentes trivias.
 | `text`       | str      | NOT NULL    | Texto de la pregunta                     |
 | `difficulty` | str      | NOT NULL    | Nivel de dificultad (`easy`, `medium`, `hard`)|
 | `created_at` | datetime | NOT NULL    | Fecha y hora de la creación              |
+
+> Se decide dejar `difficulty` como string por la misma razón que `role` en User: son tres valores acotados, validados con el enum `QuestionDifficulty` a nivel de aplicación.
 
 ---
 
@@ -88,6 +92,8 @@ Almacena la participación de un User en una Trivia específica.
 
 > La combinación de `(trivia_id, user_id)` es única, un usuario puede solamente participar una única vez en una trivia.
 
+> `score` está denormalizado a propósito, se usa en el ranking para evitar joins en lectura y queda como registro histórico del puntaje obtenido.
+
 ---
 
 ### UserAnswer
@@ -102,4 +108,6 @@ Almacena la respuesta seleccionada por un TriviaParticipant para cada Question d
 | `selected_option_id` | int | FK → AnswerOption | ID de la AnswerOption seleccionada |
 | `is_correct` | bool | NOT NULL | Indica si la respuesta es correcta |
 
-> La combinación de `(participant_id, question_id)` es única, un TriviaParticipant puede responder una única vez una Question, este diseño genera una implementación idempotente a nivel de base de datos.
+> La combinación de `(participant_id, question_id)` es única, un TriviaParticipant puede responder una única vez una Question, este diseño previene duplicados a nivel de DB.
+
+> `is_correct` también está denormalizado, para dejar registro histórico sin importar que luego un admin corrija qué opción está marcada como correcta.
