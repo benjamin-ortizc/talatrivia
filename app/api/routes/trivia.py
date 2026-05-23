@@ -3,7 +3,13 @@ from fastapi import APIRouter, HTTPException, status
 from app.api.deps import AdminUser, CurrentUser, DbSession
 from app.models import TriviaParticipant
 from app.models.trivia import Trivia
-from app.schemas.trivia import TriviaCreate, TriviaForUser, TriviaRead, TriviaSummary
+from app.schemas.trivia import (
+    TriviaCreate,
+    TriviaForUser,
+    TriviaPlay,
+    TriviaRead,
+    TriviaSummary,
+)
 from app.services import trivia as trivia_service
 
 router = APIRouter(prefix="/trivias", tags=["Trivias"])
@@ -65,4 +71,30 @@ def get_trivia(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Trivia {trivia_id} no encontrada",
+        )
+
+
+@router.get("/{trivia_id}/play", response_model=TriviaPlay)
+def play_trivia(
+    trivia_id: int,
+    current_user: CurrentUser,
+    db: DbSession,
+) -> Trivia:
+    """Obtiene las preguntas y posibles respuestas al usuario, sin exponer datos sensibles"""
+    try:
+        return trivia_service.play_trivia(db, trivia_id, current_user.id)
+    except trivia_service.TriviaNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Trivia {trivia_id} no encontrada",
+        )
+    except trivia_service.NotParticipantError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No estás asignado como participante de esta trivia",
+        )
+    except trivia_service.TriviaAlreadyCompletedError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ya completaste esta trivia",
         )

@@ -1,5 +1,7 @@
+from datetime import datetime, timezone
+
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.question import Question
 from app.models.trivia import Trivia
@@ -27,6 +29,18 @@ class ParticipantsNotFoundError(Exception):
 
 class TriviaNotFoundError(Exception):
     """Error handler cuando no se encuentra la trivia en la DB"""
+
+    pass
+
+
+class NotParticipantError(Exception):
+    """Error handler cuando el usuario no está asignado como participante de la trivia"""
+
+    pass
+
+
+class TriviaAlreadyCompletedError(Exception):
+    """Error handler cuando el usuario ya completó la trivia y no puede volver a jugarla"""
 
     pass
 
@@ -76,6 +90,42 @@ def list_trivias_by_user(db: Session, user_id: int) -> list[TriviaParticipant]:
         select(TriviaParticipant).where(TriviaParticipant.user_id == user_id)
     ).all()
     return list(participation)
+
+
+def play_trivia(db: Session, trivia_id: int, user_id: int) -> Trivia:
+    """Comienza a jugar la trivia, y le entrega las preguntas a responder"""
+
+    # Preload de relaciones para evitar N+1
+    trivia = db.scalar(
+        select(Trivia)
+        .where(Trivia.id == trivia_id)
+        .options(selectinload(Trivia.questions).selectinload(Question.options))
+    )
+    if trivia is None:
+        raise TriviaNotFoundError(f"Trivia {trivia_id} no encontrada")
+
+    participant = db.scalar(
+        select(TriviaParticipant).where(
+            TriviaParticipant.trivia_id == trivia_id,
+            TriviaParticipant.user_id == user_id,
+        )
+    )
+    if participant is None:
+        raise NotParticipantError(
+            f"Usuario {user_id} no está asignado a la trivia {trivia_id}"
+        )
+
+    if participant.completed_at is not None:
+        raise TriviaAlreadyCompletedError(
+            f"Usuario {user_id} ya completó su participación en la trivia {trivia_id}"
+        )
+
+    # Si es la primera vez que entra a jugar, marcamos el inicio
+    if participant.started_at is None:
+        participant.started_at = datetime.now(timezone.utc)
+        db.commit()
+
+    return trivia
 
 
 #
