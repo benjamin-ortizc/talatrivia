@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
+    from app.models.question import Question
     from app.models.trivia_participant import TriviaParticipant
     from app.models.trivia_question import TriviaQuestion
 
@@ -26,4 +27,8 @@ class Trivia(Base):
     participants: Mapped[list["TriviaParticipant"]] = relationship(
         back_populates="trivia",
         cascade="all, delete-orphan",
+    )
+    questions: Mapped[list["Question"]] = relationship(
+        secondary="trivia_questions",
+        viewonly=True,
     )
