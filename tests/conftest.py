@@ -19,6 +19,7 @@ from app.models import (  # noqa: F401
     UserAnswer,
 )
 from app.models.user import UserRole
+from app.core.ratelimit import limiter
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
@@ -26,6 +27,7 @@ TEST_DATABASE_URL = os.getenv(
     f"@db-test:5432/{settings.db_name}_test",
 )
 
+limiter.enabled = False
 
 @pytest.fixture(scope="session")
 def engine():
