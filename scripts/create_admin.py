@@ -1,6 +1,6 @@
+from app.core.security import hash_password
 from app.database import SessionLocal
 from app.models.user import User, UserRole
-from app.core.security import hash_password
 
 
 def create_admin(name: str, email: str, password: str):

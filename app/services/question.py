@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.question import Question
 from app.models.answer_option import AnswerOption
+from app.models.question import Question
 from app.schemas.question import QuestionCreate
 
 

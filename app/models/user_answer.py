@@ -6,9 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.trivia_participant import TriviaParticipant
-    from app.models.question import Question
     from app.models.answer_option import AnswerOption
+    from app.models.question import Question
+    from app.models.trivia_participant import TriviaParticipant
+
 
 class UserAnswer(Base):
     __tablename__ = "user_answers"

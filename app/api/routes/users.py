@@ -5,7 +5,6 @@ from app.api.deps import AdminUser, CurrentUser, DbSession
 from app.models.user import User
 from app.schemas.user import UserRead
 
-
 router = APIRouter(prefix="/users", tags=["Usuarios"])
 
 

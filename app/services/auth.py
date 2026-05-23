@@ -21,7 +21,7 @@ class InvalidCredentialsError(Exception):
 def register_user(db: Session, user_data: UserCreate) -> User:
     """Registra a un nuevo usuario, utilizando el contrato de UserCreate"""
     existing = db.scalar(select(User).where(User.email == user_data.email))
-    
+
     if existing is not None:
         raise EmailAlreadyRegisteredError("Email ya registrado")
 
@@ -40,8 +40,8 @@ def register_user(db: Session, user_data: UserCreate) -> User:
 
 def authenticate_user(db: Session, email: str, password: str) -> str:
     """
-        Recibe las credenciales y valida autenticación del usuario, 
-        entrega access JWT token al cliente
+    Recibe las credenciales y valida autenticación del usuario,
+    entrega access JWT token al cliente
     """
     user = db.scalar(select(User).where(User.email == email))
     if user is None:

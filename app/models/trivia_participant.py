@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.user import User
     from app.models.user_answer import UserAnswer
 
+
 class TriviaParticipant(Base):
     __tablename__ = "trivia_participants"
     __table_args__ = (

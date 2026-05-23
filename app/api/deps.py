@@ -10,7 +10,6 @@ from app.core.security import decode_access_token
 from app.database import get_db
 from app.models.user import User, UserRole
 
-
 bearer_scheme = HTTPBearer()
 
 DbSession = Annotated[Session, Depends(get_db)]

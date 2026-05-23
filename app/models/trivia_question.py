@@ -6,8 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.trivia import Trivia
     from app.models.question import Question
+    from app.models.trivia import Trivia
+
 
 class TriviaQuestion(Base):
     __tablename__ = "trivia_questions"

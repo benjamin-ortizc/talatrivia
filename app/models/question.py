@@ -1,7 +1,6 @@
-from typing import TYPE_CHECKING
-
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -13,10 +12,12 @@ from app.database import Base
 if TYPE_CHECKING:
     from app.models.answer_option import AnswerOption
 
+
 class QuestionDifficulty(str, Enum):
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
+
 
 class Question(Base):
     __tablename__ = "questions"

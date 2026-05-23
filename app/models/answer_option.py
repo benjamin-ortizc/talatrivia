@@ -10,6 +10,7 @@ from app.database import Base
 if TYPE_CHECKING:
     from app.models.question import Question
 
+
 class AnswerOption(Base):
     __tablename__ = "answer_options"
 
