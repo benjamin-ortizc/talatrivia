@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.api.deps import DbSession
+from app.core.ratelimit import limiter
 from app.models import User
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.user import UserCreate, UserRead
@@ -14,8 +15,12 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
 )
-def register(user_data: UserCreate, db: DbSession) -> User:
-    """Endpoint encargado de manejar el registro de un usuario"""
+@limiter.limit("3/minute")
+def register(request: Request, user_data: UserCreate, db: DbSession) -> User:
+    """
+        Endpoint encargado de manejar el registro de un usuario.
+        Rate limit: 3 registros por minuto por IP, para prevenir spam de cuentas.
+    """
     try:
         user = auth_service.register_user(db, user_data)
     except auth_service.EmailAlreadyRegisteredError:
@@ -27,8 +32,14 @@ def register(user_data: UserCreate, db: DbSession) -> User:
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(credentials: LoginRequest, db: DbSession) -> TokenResponse:
-    """Endpoint encargado de manejar el inicio de sesión de un usuario"""
+@limiter.limit("5/minute")
+def login(
+    request: Request, credentials: LoginRequest, db: DbSession
+) -> TokenResponse:
+    """
+        Endpoint encargado de manejar el inicio de sesión de un usuario.
+        Rate limit: 5 intentos por minuto por IP, para prevenir brute force.
+    """
     try:
         token = auth_service.authenticate_user(
             db,

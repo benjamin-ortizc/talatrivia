@@ -13,6 +13,7 @@ dependencies = [
     "PyJWT>=2.12,<2.13",
     "bcrypt>=5.0,<6",
     "email-validator>=2.2,<3",
+    "slowapi>=0.1.9,<0.2",
 ]
 
 [project.optional-dependencies]
