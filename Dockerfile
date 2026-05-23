@@ -25,12 +25,12 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 # Development Environment (runtime deps + dev deps)
 FROM base AS development
 
-RUN pip install --no-cache-dir ".[dev]"
+RUN pip install --no-cache-dir -e ".[dev]"
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 FROM base AS test
 
-RUN pip install --no-cache-dir ".[test]"
+RUN pip install --no-cache-dir -e ".[test]"
 
 CMD ["pytest"]
