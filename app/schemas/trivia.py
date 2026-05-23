@@ -136,10 +136,19 @@ class TriviaSubmitResult(BaseModel):
     results: list[QuestionResult] = Field(validation_alias="answers")
 
 
+class RankingUser(BaseModel):
+    """Datos mínimos del usuario para el ranking, sin exponer email, role ni created_at."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
 class RankingItem(BaseModel):
     """Una entrada del ranking de una trivia"""
 
     model_config = ConfigDict(from_attributes=True)
 
-    user: UserRead
+    user: RankingUser
     score: int
