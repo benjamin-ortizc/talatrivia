@@ -19,6 +19,11 @@ dependencies = [
 dev = [
     "ruff>=0.8,<0.9",
 ]
+test = [
+    "pytest>=8.3,<9",
+    "pytest-cov>=6.0,<7",
+    "httpx>=0.28,<0.29",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -45,3 +50,28 @@ known-first-party = ["app"]
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/env.py" = ["F401"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=app",
+    "--cov-report=term-missing",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/__init__.py",
+    "app/*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
