@@ -28,3 +28,9 @@ FROM base AS development
 RUN pip install --no-cache-dir ".[dev]"
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+FROM base AS test
+
+RUN pip install --no-cache-dir ".[test]"
+
+CMD ["pytest"]
